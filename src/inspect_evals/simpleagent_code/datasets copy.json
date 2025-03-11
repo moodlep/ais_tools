@@ -1,0 +1,25 @@
+[
+    {
+        "task": 1,
+        "input": "Write a python function that takes a list of integers and returns the sum of all the integers in the list",
+        "output": "def sum_list(lst):\n\treturn sum(lst)",
+        "testcase": 
+            {
+                "input": "[1, 2, 3, 4, 5]",
+                "output": "15"
+            }
+        
+
+    },
+    {
+        "task": 2,
+        "input": "Write a python function that reverses a string",
+        "output": "def reverse_string(s):\n\treturn s[::-1]",
+        "testcase": 
+            {
+                "input": "'world'",
+                "output": "'dlrow'"
+            }
+        
+        }
+]

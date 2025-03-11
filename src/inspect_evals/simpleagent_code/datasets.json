@@ -1,0 +1,14 @@
+[
+    {
+        "task": 1,
+        "input": "Write a python function that takes a list of integers and returns the sum of all the integers in the list. Then test it on the list [1, 2, 3, 4, 5]",
+        "output": "15"
+
+    },
+    {
+        "task": 2,
+        "input": "Write a python function that reverses a string. Then test it on the string 'world'",
+        "output": "'dlrow'"
+        
+    }
+]

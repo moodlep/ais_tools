@@ -26,9 +26,10 @@ Use the field mapping provided to generate a record_to_sample function. If the t
 If there are extra columns, load into the metadata dictionary"""
 USER_PROMPT_CFG = "The relevant config is here '{config}'"
 
-from utils.utils import call_llm
+from utils.utils import call_llm, code_llm
 
 if __name__ == "__main__":
 
-    response = call_llm("gpt-4o", SYSTEM_PROMPT, USER_PROMPT+USER_PROMPT_CFG.format(config=config), verbose=True) 
+    # response = call_llm("gpt-4o", SYSTEM_PROMPT, USER_PROMPT+USER_PROMPT_CFG.format(config=config), verbose=True) 
+    response = code_llm("gpt-4o", SYSTEM_PROMPT, USER_PROMPT+USER_PROMPT_CFG.format(config=config), verbose=True)
     print(response)

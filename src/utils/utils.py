@@ -114,6 +114,8 @@ def generate_formatted_response(client: OpenAI,
     response = completion.choices[0].message
 
     return response
+# ***** ARENA - end *****
+
 
 def call_llm(model, system_prompt, user_prompt, verbose=False):
     
@@ -126,4 +128,78 @@ def call_llm(model, system_prompt, user_prompt, verbose=False):
 
     response = generate_formatted_response(client=client, model=model, system=system_prompt, user=user_prompt, messages=None, verbose=verbose, response_format=None)
 
+    return response 
+
+def code_llm(model, system_prompt, user_prompt, verbose=False):
+    
+    # Configure your OpenAI API key
+    dotenv.load_dotenv()
+
+    api_key = os.getenv("OPENAI_API_KEY")
+    openai.api_key = api_key
+    client = OpenAI()
+
+    response = generate_code(client=client, model=model, system=system_prompt, user=user_prompt, messages=None, verbose=verbose)
+
     return response        
+
+
+@retry_with_exponential_backoff
+def generate_code(client: OpenAI,
+                    model = MODEL,
+                    messages:Optional[List[dict]]=None,
+                    user:Optional[str]=None,
+                    system:Optional[str]=None,
+                    verbose: bool = False,
+                    filename: str = "inspect_task.py"):
+                                
+    if messages is None:
+        messages = apply_message_format(user=user, system=system)
+
+    if verbose:
+        for message in messages:
+            print(f"{message['role'].upper()}:\n{message['content']}\n")
+
+    assistant = client.beta.assistants.create(
+        model=model,
+        instructions=system,
+        tools = [{"type": "code_interpreter"}],
+    )
+
+    # create a thread / conversation with the assistant
+    thread = client.beta.threads.create()
+
+    # Add a message to the thread: 
+    message = client.beta.threads.messages.create(
+        thread_id=thread.id,
+        role="user",
+        content=user
+        )
+
+    # create a run (without streaming) and poll it until it's complete
+    run = client.beta.threads.runs.create_and_poll(
+        thread_id=thread.id,
+        assistant_id=assistant.id,
+        # instructions="Please address the user as Jane Doe. The user has a premium account."
+        )
+    
+    if run.status == 'completed': 
+        messages = client.beta.threads.messages.list(
+            thread_id=thread.id
+        )
+        print(messages)
+    else:
+        print(run.status)
+    
+    # Access the generated file
+    # file_id = response['attachments'][0]['file_id']
+    # download_link = response['attachments'][0]['download_link']
+    # print(f"File ID: {file_id}, Download Link: {download_link}")
+
+    # code_file = client.files.content(file_id)
+    # code = code_file.read()
+
+    # with open(f"{filename}", "wb") as file:
+    #     file.write(code)
+
+    return messages

@@ -151,7 +151,7 @@ def generate_code(client: OpenAI,
                     user:Optional[str]=None,
                     system:Optional[str]=None,
                     verbose: bool = False,
-                    filename: str = "inspect_task.py"):
+                    filename: str = "/home/perusha/git_repos/ais_tools/src/inspect_evals/aisc_evals/py_file.py"):
                                 
     if messages is None:
         messages = apply_message_format(user=user, system=system)
@@ -160,10 +160,16 @@ def generate_code(client: OpenAI,
         for message in messages:
             print(f"{message['role'].upper()}:\n{message['content']}\n")
 
+    # Create assistant file
+    file = client.files.create(
+        file=open(filename, "rb"),
+        purpose='assistants')
+
     assistant = client.beta.assistants.create(
         model=model,
         instructions=system,
         tools = [{"type": "code_interpreter"}],
+          tool_resources={"code_interpreter": {"file_ids": [file.id]}}
     )
 
     # create a thread / conversation with the assistant
@@ -173,7 +179,12 @@ def generate_code(client: OpenAI,
     message = client.beta.threads.messages.create(
         thread_id=thread.id,
         role="user",
-        content=user
+        content=user,
+        attachments=[
+        {
+          "file_id": file.id,
+          "tools": [{"type": "code_interpreter"}]
+        }]
         )
 
     # create a run (without streaming) and poll it until it's complete

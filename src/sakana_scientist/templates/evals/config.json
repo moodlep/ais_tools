@@ -1,0 +1,8 @@
+{
+    "dataset": "HuggingFaceH4/ultrachat_200k",
+    "dataset_split": "validation",
+    "limit": 10,
+    "trust": "False",
+    "scorer": "model_graded_fact",
+    "scorer_model": "openai/gpt4o"
+}
